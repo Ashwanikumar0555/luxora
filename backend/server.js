@@ -3,6 +3,10 @@ const cors = require("cors");
 const dotenv = require("dotenv")
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+// const productRoutes = require("./routes/productRoutes");
+const productRoutes = require("./routes/productRoutes")
+
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -17,7 +21,6 @@ const PORT = process.env.PORT || 3000;
 
 // connect to MongoDB
 connectDB();
-
 app.get("/", (req,res) => {
     res.send("WELCOME TO LUXORA API!");
 });
@@ -25,6 +28,7 @@ app.get("/", (req,res) => {
 
 // API Routes
 app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
 
 
 

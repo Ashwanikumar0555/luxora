@@ -1,125 +1,3 @@
-// const express = require("express");
-// const User = require("../models/User");
-// const jwt = require("jsonwebtoken");
-// const protect = require("../middleware/authMiddleware");
-
-
-// const router = express.Router();
-
-// // @route POST /api/users/register
-// // @desc Register a new user
-// // @access Public
-
-// router.post("/register", async (req, res) => {
-//     const { name, email, password } = req.body;
-
-//     try {
-//         // Registration logic
-
-//         let user = await User.findOne({ email });
-
-//         if (user) return res.status(400).json({message: "User already exists"});
-
-//         user = new User({ name, email, password});
-//         await user.save();
-
-//         // res.status(201).json({
-//         //     user: {
-//         //         _id: user._id,
-//         //         name: user.name,
-//         //         email: user.email,
-//         //         role: user.role,  
-//         //     }
-//         // })
-
-//         // Create JWT Payload
-//         const payload = {user: {id: user._id, role: user.role} };
-
-
-//         // Sign and return the token along with user data 
-//         jwt.sign(payload, process.env.JWT_SECRET,{expiresIn: "40h"}, (err, token) => {
-//             if (err) throw err;
-          
-//             //Send the user and token in response
-
-//             res.status(201).json({
-//                 user: {
-//                     _id: user._id,
-//                     name: user.name,
-//                     email: user.email,
-//                     role: user.role,
-
-//                 },
-//                 token,
-//             });
-
-//         });
-
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).send("Server error");
-//     }
-// }
-// );
-
-// // @route POST /api/users/login 
-// // @desc Authenticate user 
-// // @access Public
-
-// router.post("/login", async (req, res) => {
-//     const { email, password } = req.body;
-
-//     try { 
-//         // Find the user by email
-//         let user = await User.findOne({email});
-
-//         if (!user) return res.status(400).json({ message: "Invalid Credentials"});
-//         const isMatch = await user.matchPassword(password);
-
-//         if (!isMatch)
-//             return res.status(400).json({ message: "Invalid Credentials"});
-
-//         // Create JWT Payload
-//         const payload = {user: {id: user._id, role: user.role} };
-
-
-//         // Sign and return the token along with user data 
-//         jwt.sign(payload, process.env.JWT_SECRET,{expiresIn: "40h"}, (err, token) => {
-//             if (err) throw err;
-          
-//             //Send the user and token in response
-
-//             res.json({
-//                 user: {
-//                     _id: user._id,
-//                     name: user.name,
-//                     email: user.email,
-//                     role: user.role,
-
-//                 },
-//                 token,
-//             });
-
-//         });
-
-//     }catch (error) {
-//         console.log(error);
-//         res.status(500).send("Server error");
-
-//     }
-// });
-
-
-// // @route GET /api/users/profile
-// // @desc Get logged-in user's profile (protected Route)
-// //@access Private
-
-// router.get("/profile", protect,async (req, res) => {
-//     res.json(req.user);
-// })
- 
-// module.exports = router;
-
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -128,7 +6,15 @@ const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-/**
+const generateToken = (payload) => {
+    try {
+        return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "48h" });
+    } catch (error) {
+        throw new Error("Token generation failed");
+    }
+};
+
+/** 
  * @route   POST /api/users/register
  * @desc    Register a new user
  * @access  Public
@@ -137,33 +23,26 @@ router.post("/register", async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        // Validate required fields
         if (!name || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        // Check if user already exists
         let user = await User.findOne({ email });
         if (user) return res.status(400).json({ message: "User already exists" });
 
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        // Create new user
+        // Create new user - password will be hashed by the pre-save hook
         user = new User({
             name,
             email,
-            password: hashedPassword, // Store hashed password
+            password, // Don't hash here, let the model handle it
+            role: "user"
         });
 
         await user.save();
 
-        // Create JWT Token
-        const payload = { user: { id: user._id, role: user.role } };
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "40h" });
+        const payload = { id: user._id, role: user.role };
+        const token = generateToken(payload);
 
-        // Send response with user data and token
         res.status(201).json({
             user: {
                 _id: user._id,
@@ -173,9 +52,8 @@ router.post("/register", async (req, res) => {
             },
             token,
         });
-
     } catch (error) {
-        console.error(error);
+        console.error("Error in registration:", error);
         res.status(500).json({ message: "Server error" });
     }
 });
@@ -189,24 +67,24 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Validate required fields
         if (!email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        // Find user by email
         let user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "Invalid Credentials" });
 
-        // Check password match
-        const isMatch = await bcrypt.compare(password, user.password);
+        // Use the matchPassword method from the User model
+        const isMatch = await user.matchPassword(password);
+        console.log("Entered Password:", password);
+        console.log("Stored Hashed Password:", user.password);
+        console.log("Password Match:", isMatch);
+
         if (!isMatch) return res.status(400).json({ message: "Invalid Credentials" });
 
-        // Create JWT Token
-        const payload = { user: { id: user._id, role: user.role } };
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "40h" });
+        const payload = { id: user._id, role: user.role };
+        const token = generateToken(payload);
 
-        // Send response with user data and token
         res.json({
             user: {
                 _id: user._id,
@@ -216,9 +94,8 @@ router.post("/login", async (req, res) => {
             },
             token,
         });
-
     } catch (error) {
-        console.error(error);
+        console.error("Error in login:", error);
         res.status(500).json({ message: "Server error" });
     }
 });
@@ -229,7 +106,16 @@ router.post("/login", async (req, res) => {
  * @access  Private (Protected)
  */
 router.get("/profile", protect, async (req, res) => {
-    res.json(req.user);
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error("Error fetching profile:", error);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 module.exports = router;
