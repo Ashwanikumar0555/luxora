@@ -1,6 +1,6 @@
 # Luxora ✨ - E-commerce Fashion Clothing Brand Website 👗
 
-![Luxora Banner](https://raw.githubusercontent.com/Ashwanikumar0555/luxora/main/frontend/src/assets/rabbit-hero.webp)
+![Luxora Banner](https://raw.githubusercontent.com/Ashwanikumar0555/luxora/main/frontend/src/assets/Banner.png)
 
 Welcome to **Luxora** 🌟, your one-stop e-commerce destination for luxurious fashion! We bring you curated collections of premium clothing for men and women, blending timeless elegance with cutting-edge style. Get ready to elevate your wardrobe and shop with confidence! 🛍️
 
