@@ -3,14 +3,17 @@ import LuxoraButton from "../components/LuxoraButton"
 import { useState } from 'react';
 import login from "../assets/login.webp" 
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../redux/slices/authSlice';
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const dispatch = useDispatch();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("User Login:", { email, password});
+        dispatch(loginUser({ email, password}));
     }
 
   return (
@@ -60,7 +63,4 @@ const Login = () => {
 export default Login
 
 
-
-
-
-
+//////////////////////////////////
