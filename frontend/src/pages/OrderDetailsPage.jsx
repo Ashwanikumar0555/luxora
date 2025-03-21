@@ -2,45 +2,36 @@ import React from 'react'
 import { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { Link } from "react-router-dom"
+import Women1 from "../assets/Women 1.jpg";
+import Women2 from "../assets/Women 2.jpg";
+import Women3 from "../assets/Women 3.jpg";
+import Women4 from "../assets/Women 4.jpg";
+import Women5 from "../assets/Women 5.jpg";
+import Women6 from "../assets/Women 6.jpg";
+import Women7 from "../assets/Women 7.jpg";
+import Women8 from "../assets/Women 8.jpg";
+import Women9 from "../assets/Women 9.jpg";
+import Women10 from "../assets/Women 10.jpg";
+import Men1 from "../assets/Men 1.jpg";
+import Men2 from "../assets/Men 2.jpg";
+import Men3 from "../assets/Men 3.jpg";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchOrderDetails } from '../redux/slices/orderSlice';
+
 
 
 
 const OrderDetailsPage = () => {
     const { id } = useParams();
-    const [orderDetails, setOrderDetails] = useState(null);
+    const dispatch = useDispatch();
+    const { orderDetails, loading, error } = useSelector((state) => state.orders);
 
-    useEffect(() => {
-
-        const mockOrderDetails = {
-            _id: id,
-            createdAt: new Date(),
-            isPaid: true,
-            isDelivered: false,
-            paymentMethod: "PayPal",
-            shippingMethod : "Standard",
-            shippingAddress: { city: "New York", country: "USA"},
-            orderItems: [
-                {
-                    productId : "1",
-                    name: "Jacket",
-                    price: 120,
-                    quantity: 1,
-                    image: "https://picsum.photos/200/300?random=6"
-                },
-
-                {
-                    productId : "2",
-                    name: "Shirt",
-                    price: 10,
-                    quantity: 2,
-                    image: "https://picsum.photos/200/300?random=2"
-                },
-            ]
-
-        };
-        setOrderDetails(mockOrderDetails);
-    }, [id]);
-
+   useEffect(() => {
+    dispatch(fetchOrderDetails(id));
+   }, [dispatch,id]);
+ 
+   if (loading) return <p>Loading...</p>;
+   if (error) return <p>Error: {error}</p>;
 
   return (
 
@@ -119,7 +110,7 @@ const OrderDetailsPage = () => {
                                         </Link>
                                     </td>
                                     <td className="py-2 px-4">${item.price}</td>
-                                    <td className="py-2 px-4">${item.quantity}</td>
+                                    <td className="py-2 px-4">{item.quantity}</td>
                                     <td className="py-2 px-4">${item.price * item.quantity}</td>
                                 </tr>
                             ))}
