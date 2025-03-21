@@ -1,14 +1,17 @@
-
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_BACKEND_URL}`;
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"; // Fallback for safety
 
-// Helper function to get the token and handle null case
+// Create an Axios instance for reusability and better token management
+const api = axios.create({
+  baseURL: `${API_URL}/api/admin`,
+});
+
+// Helper function to get the token
 const getAuthHeader = () => {
   const token = localStorage.getItem("userToken");
-  return token ? `Bearer ${token}` : null;
+  return token ? { Authorization: `Bearer ${token}` } : null;
 };
 
 // Async thunk to fetch admin products
@@ -16,17 +19,18 @@ export const fetchAdminProducts = createAsyncThunk(
   "adminProducts/fetchAdminProducts",
   async (_, { rejectWithValue }) => {
     try {
-      const authHeader = getAuthHeader();
-      if (!authHeader) throw new Error("No authentication token found");
-      
-      const response = await axios.get(`${API_URL}/api/admin/products`, {
-        headers: {
-          Authorization: authHeader,
-        },
-      });
-      return response.data; // Ensure this matches your API response structure
+      const headers = getAuthHeader();
+      if (!headers) {
+        return rejectWithValue("Please log in to access admin products");
+      }
+      const response = await api.get("/products", { headers });
+      return response.data; // Expecting an array of products
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      const message = error.response?.data?.message || error.message;
+      if (error.response?.status === 401) {
+        return rejectWithValue("Unauthorized access - please log in again");
+      }
+      return rejectWithValue(message);
     }
   }
 );
@@ -36,22 +40,20 @@ export const createProduct = createAsyncThunk(
   "adminProducts/createProduct",
   async (productData, { rejectWithValue }) => {
     try {
-      const authHeader = getAuthHeader();
-      if (!authHeader) throw new Error("No authentication token found");
-
-      const response = await axios.post(
-        `${API_URL}/api/admin/products`,
-        productData,
-        {
-          headers: {
-            Authorization: authHeader,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return response.data;
+      const headers = getAuthHeader();
+      if (!headers) {
+        return rejectWithValue("Please log in to create a product");
+      }
+      const response = await api.post("/products", productData, {
+        headers: { ...headers, "Content-Type": "application/json" },
+      });
+      return response.data; // Expecting the created product object
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      const message = error.response?.data?.message || error.message;
+      if (error.response?.status === 401) {
+        return rejectWithValue("Unauthorized - please log in again");
+      }
+      return rejectWithValue(message);
     }
   }
 );
@@ -61,22 +63,20 @@ export const updateProduct = createAsyncThunk(
   "adminProducts/updateProduct",
   async ({ id, productData }, { rejectWithValue }) => {
     try {
-      const authHeader = getAuthHeader();
-      if (!authHeader) throw new Error("No authentication token found");
-
-      const response = await axios.put(
-        `${API_URL}/api/admin/products/${id}`,
-        productData,
-        {
-          headers: {
-            Authorization: authHeader,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return response.data;
+      const headers = getAuthHeader();
+      if (!headers) {
+        return rejectWithValue("Please log in to update a product");
+      }
+      const response = await api.put(`/products/${id}`, productData, {
+        headers: { ...headers, "Content-Type": "application/json" },
+      });
+      return response.data; // Expecting the updated product object
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      const message = error.response?.data?.message || error.message;
+      if (error.response?.status === 401) {
+        return rejectWithValue("Unauthorized - please log in again");
+      }
+      return rejectWithValue(message);
     }
   }
 );
@@ -86,29 +86,35 @@ export const deleteProduct = createAsyncThunk(
   "adminProducts/deleteProduct",
   async (id, { rejectWithValue }) => {
     try {
-      const authHeader = getAuthHeader();
-      if (!authHeader) throw new Error("No authentication token found");
-
-      await axios.delete(`${API_URL}/api/admin/products/${id}`, {
-        headers: {
-          Authorization: authHeader,
-        },
-      });
+      const headers = getAuthHeader();
+      if (!headers) {
+        return rejectWithValue("Please log in to delete a product");
+      }
+      await api.delete(`/products/${id}`, { headers });
       return id; // Return the ID for state filtering
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      const message = error.response?.data?.message || error.message;
+      if (error.response?.status === 401) {
+        return rejectWithValue("Unauthorized - please log in again");
+      }
+      return rejectWithValue(message);
     }
   }
 );
 
 const adminProductsSlice = createSlice({
-  name: "adminProducts", // Changed to plural to match state selector
+  name: "adminProducts",
   initialState: {
     products: [],
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    // Optional: Add a reducer to clear the error manually if needed
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Fetch Products
@@ -118,7 +124,7 @@ const adminProductsSlice = createSlice({
       })
       .addCase(fetchAdminProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = Array.isArray(action.payload) ? action.payload : action.payload.products || [];
+        state.products = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchAdminProducts.rejected, (state, action) => {
         state.loading = false;
@@ -173,9 +179,8 @@ const adminProductsSlice = createSlice({
   },
 });
 
+export const { clearError } = adminProductsSlice.actions;
 export default adminProductsSlice.reducer;
-
-
 
 
 // import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
