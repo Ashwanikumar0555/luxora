@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { FaSearch, FaShoppingBag, FaUser } from 'react-icons/fa'; 
+import Navbar from '../components/Common/Navbar'; 
+import Topbar from '../components/Layout/Topbar'; 
 
 const ErrorPage = () => {
     const navigate = useNavigate();
@@ -12,29 +15,29 @@ const ErrorPage = () => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [suggestedLinks] = useState([
-        { title: 'Home', path: '/' },
-        { title: 'About', path: '/about' },
-        { title: 'Services', path: '/services' },
+        { title: 'Shop All', path: '/collections' },
+        { title: 'Men', path: '/collections/men' },
+        { title: 'Women', path: '/collections/women' },
     ]);
 
     // Animation variants
     const containerVariants = {
-        hidden: { opacity: 0, y: 20 },
+        hidden: { opacity: 0, y: 30 },
         visible: { 
             opacity: 1, 
             y: 0,
-            transition: { duration: 0.5, staggerChildren: 0.2 }
+            transition: { duration: 0.7, staggerChildren: 0.2 }
         }
     };
 
     const itemVariants = {
         hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0 }
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
     };
 
     const handleSearch = (e) => {
         e.preventDefault();
-        if (searchQuery.trim() !== '') {
+        if (searchQuery.trim()) {
             navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
         }
     };
@@ -43,11 +46,11 @@ const ErrorPage = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            alert('Your message has been sent successfully!');
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+            alert('Message sent successfully!');
             setContactForm({ name: '', email: '', message: '' });
         } catch (error) {
-            alert('Failed to send message. Please try again.');
+            alert('Failed to send message. Try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -57,131 +60,77 @@ const ErrorPage = () => {
         document.querySelector('input[type="search"]')?.focus();
     }, []);
 
-    // Topbar Component
-    const Topbar = () => (
-        <div className="fixed top-0 left-0 w-full bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 shadow-sm px-6 py-4 z-50 flex justify-between items-center">
-            <Link to="/" className="text-xl font-bold text-blue-900 hover:text-blue-600 transition-colors">
-                MyApp
-            </Link>
-            <div className="flex gap-4">
-                <Link 
-                    to="/login" 
-                    className="bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-full hover:bg-gray-200 transition-colors"
-                >
-                    Log In
-                </Link>
-                <Link 
-                    to="/signup" 
-                    className="bg-blue-600 text-white font-medium py-2 px-4 rounded-full hover:bg-blue-700 transition-colors"
-                >
-                    Sign Up
-                </Link>
-            </div>
-        </div>
-    );
-
-    // Navbar Component
-    const Navbar = () => (
-        <nav className="w-full bg-white mt-16 border-b border-gray-200 shadow-sm px-6 py-4">
-            <div className="max-w-7xl mx-auto flex justify-between items-center">
-                <div className="flex gap-8">
-                    <Link to="/" className="text-gray-600 hover:text-blue-600 font-medium relative group transition-colors">
-                        Home
-                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
-                    </Link>
-                    <Link to="/about" className="text-gray-600 hover:text-blue-600 font-medium relative group transition-colors">
-                        About
-                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
-                    </Link>
-                    <Link to="/services" className="text-gray-600 hover:text-blue-600 font-medium relative group transition-colors">
-                        Services
-                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
-                    </Link>
-                    <Link to="/contact" className="text-gray-600 hover:text-blue-600 font-medium relative group transition-colors">
-                        Contact
-                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
-                    </Link>
-                </div>
-                <button className="md:hidden text-gray-600 text-2xl" aria-label="Menu">
-                    ☰
-                </button>
-            </div>
-        </nav>
-    );
-
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 px-4 py-8">
-            <Topbar />
-            <Navbar />
+        <div className="min-h-screen bg-gray-50 px-6 py-10">
+            <Topbar  /> {/* Imported Topbar */}
+            <Navbar /> {/* Imported Navbar */}
 
             <motion.div 
-                className="max-w-4xl mx-auto pt-12"
+                className="max-w-6xl mx-auto pt-20 text-center"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
                 {/* Error Message Section */}
-                <motion.div variants={itemVariants} className="text-center mt-12">
-                    <h1 className="text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-pink-600">
+                <motion.div variants={itemVariants}>
+                    <h1 className="text-9xl md:text-[12rem] font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-rabbit-red">
                         404
                     </h1>
-                    <h2 className="text-4xl font-bold mt-4 text-gray-900 tracking-tight">
-                        Page Not Found
+                    <h2 className="text-4xl md:text-5xl font-bold mt-4 text-gray-800 tracking-tight">
+                        Oops! Lost in Style
                     </h2>
-                    <p className="text-xl text-gray-600 mt-3 max-w-md mx-auto leading-relaxed">
-                        Looks like you've ventured into uncharted territory. Let's get you back on track!
+                    <p className="text-lg md:text-xl text-gray-600 mt-4 max-w-lg mx-auto leading-relaxed">
+                        This page seems to have gone out of fashion. Let’s get you back to the latest trends!
                     </p>
                 </motion.div>
 
                 {/* Action Buttons */}
                 <motion.div 
                     variants={itemVariants}
-                    className="flex flex-wrap justify-center gap-4 mt-8"
+                    className="flex flex-wrap justify-center gap-6 mt-10"
                 >
                     <Link 
                         to="/" 
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:-translate-y-1 transition-all duration-300"
+                        className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-10 rounded-full shadow-lg hover:-translate-y-1 transition-all duration-300"
                     >
                         Return Home
                     </Link>
                     <Link 
                         to="/contact" 
-                        className="bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-8 rounded-full shadow-lg border border-gray-200 hover:-translate-y-1 transition-all duration-300"
+                        className="bg-white hover:bg-gray-100 text-rabbit-red font-semibold py-3 px-10 rounded-full shadow-lg border border-rabbit-red hover:-translate-y-1 transition-all duration-300"
                     >
-                        Contact Support
+                        Contact Us
                     </Link>
                 </motion.div>
 
                 {/* Search Section */}
-                <motion.div variants={itemVariants} className="mt-12">
-                    <form onSubmit={handleSearch} className="relative max-w-xl mx-auto">
+                <motion.div variants={itemVariants} className="mt-14">
+                    <form onSubmit={handleSearch} className="relative max-w-md mx-auto">
                         <input
                             type="search"
-                            placeholder="Search for something else..."
-                            className="w-full px-6 py-4 border border-gray-200 rounded-full shadow-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300 bg-white"
+                            placeholder="Search our collections..."
+                            className="w-full px-6 py-4 border border-gray-300 rounded-full shadow-md focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all duration-300 bg-white text-gray-800 placeholder-gray-500"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         <button
                             type="submit"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition-colors"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-full transition-colors"
                         >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                            <FaSearch className="w-5 h-5" />
                         </button>
                     </form>
                 </motion.div>
 
                 {/* Suggested Links */}
-                <motion.div variants={itemVariants} className="mt-12 text-center">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4">Try these pages instead:</h3>
-                    <div className="flex flex-wrap justify-center gap-3">
+                <motion.div variants={itemVariants} className="mt-14">
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-6">Explore These Instead:</h3>
+                    <div className="flex flex-wrap justify-center gap-4">
                         {suggestedLinks.map((link) => (
                             <Link
                                 key={link.path}
                                 to={link.path}
-                                className="px-4 py-2 bg-white rounded-full shadow-sm hover:shadow-md hover:text-blue-600 transition-all duration-300 text-gray-700"
+                                className="px-6 py-3 bg-white border border-orange-500 text-orange-500 rounded-full hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-md"
                             >
                                 {link.title}
                             </Link>
@@ -192,14 +141,14 @@ const ErrorPage = () => {
                 {/* Contact Form */}
                 <motion.div 
                     variants={itemVariants}
-                    className="mt-12 bg-white p-8 rounded-2xl shadow-xl max-w-xl mx-auto"
+                    className="mt-16 bg-white p-8 rounded-3xl shadow-xl max-w-lg mx-auto border-t-4 border-rabbit-red"
                 >
-                    <h3 className="text-2xl font-bold text-gray-800 mb-6">Still Lost? Contact Us</h3>
-                    <form onSubmit={handleContactFormSubmit} className="space-y-4">
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Still Lost?</h3>
+                    <form onSubmit={handleContactFormSubmit} className="space-y-6">
                         <input
                             type="text"
                             placeholder="Your Name"
-                            className="w-full px-5 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50"
+                            className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rabbit-red focus:border-transparent outline-none transition-all bg-white text-gray-800"
                             value={contactForm.name}
                             onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
                             required
@@ -207,14 +156,14 @@ const ErrorPage = () => {
                         <input
                             type="email"
                             placeholder="Your Email"
-                            className="w-full px-5 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50"
+                            className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rabbit-red focus:border-transparent outline-none transition-all bg-white text-gray-800"
                             value={contactForm.email}
                             onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
                             required
                         />
                         <textarea
-                            placeholder="Tell us what happened..."
-                            className="w-full px-5 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-gray-50 h-32 resize-none"
+                            placeholder="What went wrong?"
+                            className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rabbit-red focus:border-transparent outline-none transition-all bg-white text-gray-800 h-32 resize-none"
                             value={contactForm.message}
                             onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                             required
@@ -222,8 +171,8 @@ const ErrorPage = () => {
                         <button 
                             type="submit" 
                             disabled={isSubmitting}
-                            className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300 ${
-                                isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
+                            className={`w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300 ${
+                                isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                             }`}
                         >
                             {isSubmitting ? 'Sending...' : 'Send Message'}
