@@ -18,11 +18,11 @@ const products = [
       gender: "Men",
       images: [
         {
-          url: "https://picsum.photos/500/500?random=39",
+          url: "https://images.unsplash.com/photo-1618001789159-ffffe6f96ef2?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           altText: "Classic Oxford Button-Down Shirt Front View",
         },
         {
-          url: "https://picsum.photos/500/500?random=40",
+          url: "https://images.unsplash.com/photo-1618001789159-ffffe6f96ef2?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           altText: "Classic Oxford Button-Down Shirt Back View",
         },
       ],
@@ -46,11 +46,11 @@ const products = [
       gender: "Men",
       images: [
         {
-          url: "https://picsum.photos/500/500?random=41",
+          url: "https://images.pexels.com/photos/17896526/pexels-photo-17896526/free-photo-of-young-man-in-a-casual-outfit-posing-in-a-modern-interior.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
           altText: "Slim-Fit Stretch Shirt Front View",
         },
         {
-          url: "https://picsum.photos/500/500?random=42",
+          url: "https://images.pexels.com/photos/17896526/pexels-photo-17896526/free-photo-of-young-man-in-a-casual-outfit-posing-in-a-modern-interior.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
           altText: "Slim-Fit Stretch Shirt Back View",
         },
       ],
@@ -74,7 +74,7 @@ const products = [
       gender: "Men",
       images: [
         {
-          url: "https://picsum.photos/500/500?random=43",
+          url: "https://images.pexels.com/photos/20715516/pexels-photo-20715516/free-photo-of-african-man-posing-in-denim-outfit.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
           altText: "Casual Denim Shirt Front View",
         },
         {
@@ -217,6 +217,7 @@ const products = [
       rating: 4.5,
       numReviews: 25,
     },
+    
     {
       name: "Long-Sleeve Thermal Tee",
       description:
